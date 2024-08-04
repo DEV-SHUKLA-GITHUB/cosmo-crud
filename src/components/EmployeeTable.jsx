@@ -13,8 +13,8 @@ const EmployeeTable = ({ employees, onEdit, onDelete }) => {
         </tr>
       </thead>
       <tbody>
-        {employees.map(emp => (
-          <tr key={emp._id} className="border-b hover:bg-gray-100">
+        {employees.map((emp, index) => (
+          <tr key={emp._id || index} className="border-b hover:bg-gray-100">
             <td className="p-2">{emp.Name}</td>
             <td className="p-2">{emp.Address}</td>
             <td className="p-2">{emp.Phone}</td>

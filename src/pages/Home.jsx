@@ -9,16 +9,14 @@ const Home = () => {
   const [newEmployee, setNewEmployee] = useState({ Name: '', Address: '', Email: '', Phone: '' });
   const [editingEmployee, setEditingEmployee] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(5);
+  const [itemsPerPage] = useState(50);
   const [totalPages, setTotalPages] = useState(1);
 
-  // Define headers
   const headers = {
     'projectId': '66ac1f3194de1e182152a7cf',
     'environmentId': '66ac1f3194de1e182152a7d0',
   };
 
-  // Fetch employees from the API
   useEffect(() => {
     const fetchEmployees = () => {
       const offset = (currentPage - 1) * itemsPerPage;
@@ -32,21 +30,16 @@ const Home = () => {
         .catch(error => console.error('Error fetching employees:', error));
     };
     fetchEmployees();
-  }, [currentPage, itemsPerPage]);
+  }, []);
 
   const handleNewEmployeeChange = (name, value) => {
-    if (name === 'Phone') {
-      setNewEmployee({ ...newEmployee, [name]: value ? parseInt(value, 10) : '' });
-    } else {
-      setNewEmployee({ ...newEmployee, [name]: value });
-    }
+    setNewEmployee(prev => ({ ...prev, [name]: value }));
   };
 
   const handleAddEmployee = (data) => {
-    console.log(newEmployee,"data",data)
     axios.post('https://free-ap-south-1.cosmocloud.io/development/api/emp', data, { headers })
       .then(response => {
-        setEmployees([...employees, response.data]);
+        setEmployees(prev => [...prev, response.data]);
         setNewEmployee({ Name: '', Address: '', Email: '', Phone: '' });
         setEditingEmployee(null); // Close the form after adding
       })
@@ -54,18 +47,14 @@ const Home = () => {
   };
 
   const handleEditEmployeeChange = (name, value) => {
-    if (name === 'Phone') {
-      setEditingEmployee({ ...editingEmployee, [name]: value ? parseInt(value, 10) : '' });
-    } else {
-      setEditingEmployee({ ...editingEmployee, [name]: value });
-    }
+    setEditingEmployee(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleUpdateEmployee = () => {
-    const { _id, ...employeeData } = editingEmployee;
+  const handleUpdateEmployee = (data) => {
+    const { _id, ...employeeData } = data;
     axios.put(`https://free-ap-south-1.cosmocloud.io/development/api/emp/${_id}`, employeeData, { headers })
       .then(response => {
-        setEmployees(employees.map(emp => emp._id === _id ? response.data : emp));
+        setEmployees(prev => prev.map(emp => emp._id === _id ? response.data : emp));
         setEditingEmployee(null);
       })
       .catch(error => console.error('Error updating employee:', error));
@@ -76,7 +65,7 @@ const Home = () => {
       headers,
       data: {}
     })
-      .then(() => setEmployees(employees.filter(emp => emp._id !== _id)))
+      .then(() => setEmployees(prev => prev.filter(emp => emp._id !== _id)))
       .catch(error => console.error('Error deleting employee:', error));
   };
 
@@ -110,8 +99,8 @@ const Home = () => {
       {editingEmployee !== null && (
         <EmployeeForm
           employee={editingEmployee}
-          onSubmit={editingEmployee._id ? (data)=> handleUpdateEmployee(data) : (data)=>handleAddEmployee(data)}
-          onChange={handleEditEmployeeChange}
+          onSubmit={editingEmployee._id ? (data) => handleUpdateEmployee(data) : (data) => handleAddEmployee(data)}
+          onChange={editingEmployee._id ? handleEditEmployeeChange : handleNewEmployeeChange}
           onClose={() => setEditingEmployee(null)}
         />
       )}
