@@ -20,7 +20,7 @@ const Home = () => {
   useEffect(() => {
     const fetchEmployees = () => {
       const offset = (currentPage - 1) * itemsPerPage;
-      axios.get(`https://free-ap-south-1.cosmocloud.io/development/api/emp?limit=${itemsPerPage}&offset=${offset}`, { headers })
+      axios.get(`https://free-ap-south-1.cosmocloud.io/development/api/employeee?limit=${itemsPerPage}&offset=${offset}`, { headers })
         .then(response => {
           setEmployees(response.data.data);
           if (response.data.page) {
@@ -30,14 +30,14 @@ const Home = () => {
         .catch(error => console.error('Error fetching employees:', error));
     };
     fetchEmployees();
-  }, []);
+  }, [currentPage,itemsPerPage,editingEmployee]);
 
   const handleNewEmployeeChange = (name, value) => {
     setNewEmployee(prev => ({ ...prev, [name]: value }));
   };
 
   const handleAddEmployee = (data) => {
-    axios.post('https://free-ap-south-1.cosmocloud.io/development/api/emp', data, { headers })
+    axios.post('https://free-ap-south-1.cosmocloud.io/development/api/employeee', data, { headers })
       .then(response => {
         setEmployees(prev => [...prev, response.data]);
         setNewEmployee({ Name: '', Address: '', Email: '', Phone: '' });
@@ -52,20 +52,20 @@ const Home = () => {
 
   const handleUpdateEmployee = (data) => {
     const { _id, ...employeeData } = data;
-    axios.put(`https://free-ap-south-1.cosmocloud.io/development/api/emp/${_id}`, employeeData, { headers })
+    axios.put(`https://free-ap-south-1.cosmocloud.io/development/api/employeee/${_id}`, employeeData, { headers })
       .then(response => {
-        setEmployees(prev => prev.map(emp => emp._id === _id ? response.data : emp));
+        setEmployees(prev => prev.map(employeee => employeee._id === _id ? response.data : employeee));
         setEditingEmployee(null);
       })
       .catch(error => console.error('Error updating employee:', error));
   };
 
   const handleDeleteEmployee = (_id) => {
-    axios.delete(`https://free-ap-south-1.cosmocloud.io/development/api/emp/${_id}`, {
+    axios.delete(`https://free-ap-south-1.cosmocloud.io/development/api/employeee/${_id}`, {
       headers,
       data: {}
     })
-      .then(() => setEmployees(prev => prev.filter(emp => emp._id !== _id)))
+      .then(() => setEmployees(prev => prev.filter(employeee => employeee._id !== _id)))
       .catch(error => console.error('Error deleting employee:', error));
   };
 
